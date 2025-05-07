@@ -1,0 +1,91 @@
+#include <stdio.h>
+
+int weight[100], value[100], n, W;
+
+void swap(int i, int j) {
+    int temp;
+    temp = weight[i]; weight[i] = weight[j]; weight[j] = temp;
+    temp = value[i]; value[i] = value[j]; value[j] = temp;
+}
+
+void sortByMaxWeight() {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (weight[j] < weight[j + 1]) swap(j, j + 1);
+        }
+    }
+}
+
+void sortByMinWeight() {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (weight[j] > weight[j + 1]) swap(j, j + 1);
+        }
+    }
+}
+
+void sortByValuePerWeight() {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            double r1 = (double)value[j] / weight[j];
+            double r2 = (double)value[j + 1] / weight[j + 1];
+            if (r1 < r2) swap(j, j + 1);
+        }
+    }
+}
+
+double knapsack(int method) {
+    if (method == 1) sortByMaxWeight();
+    if (method == 2) sortByMinWeight();
+    if (method == 3) sortByValuePerWeight();
+
+    double totalValue = 0;
+    int curWeight = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (curWeight + weight[i] <= W) {
+            curWeight += weight[i];
+            totalValue += value[i];
+        } else if (method == 3) {
+            int remain = W - curWeight;
+            totalValue += value[i] * ((double)remain / weight[i]);
+            break;
+        }
+    }
+    return totalValue;
+}
+
+void inputItems() {
+    printf("Enter number of items: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter weight and value for item %d: ", i + 1);
+        scanf("%d %d", &weight[i], &value[i]);
+    }
+
+    printf("Enter knapsack capacity: ");
+    scanf("%d", &W);
+}
+
+void menu() {
+    int choice;
+    while (1) {
+        printf("\n1. Max Weight First\n2. Min Weight First\n3. Optimal (Max Value/Weight Ratio)\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+
+        if (choice == 4) break;
+
+        printf("Max Value: %.2f\n", knapsack(choice));
+    }
+}
+
+void start() {
+    inputItems();
+    menu();
+}
+
+int main() {
+    start();
+    return 0;
+}
